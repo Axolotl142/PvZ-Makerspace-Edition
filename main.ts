@@ -5,6 +5,8 @@ namespace SpriteKind {
     export const wall = SpriteKind.create()
     export const soon = SpriteKind.create()
     export const player2 = SpriteKind.create()
+    export const Pult = SpriteKind.create()
+    export const MelonProjectile = SpriteKind.create()
 }
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.wall, function (sprite, otherSprite) {
     sprite.setVelocity(0, 0)
@@ -16,6 +18,14 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.wall, function (sprite, otherSpri
 })
 scene.onOverlapTile(SpriteKind.Enemy, assets.tile`myTile6`, function (sprite, location) {
     game.over(false)
+})
+sprites.onOverlap(SpriteKind.MelonProjectile, SpriteKind.Enemy, function (sprite, otherSprite) {
+    sprites.destroy(sprite, effects.spray, 100)
+    statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -3
+    if (statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value == 0) {
+        sprites.destroy(otherSprite)
+        kill += 1
+    }
 })
 info.onCountdownEnd(function () {
     let m = 0
@@ -59,10 +69,10 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         if (tiles.tileAtLocationEquals(tiles.getTileLocation(grid.spriteCol(mySprite), grid.spriteRow(mySprite)), sprites.castle.tileGrass1)) {
             if (Peashooter >= 1) {
                 mySprite2 = sprites.create(img`
-                    1 1 1 1 . . . . . . . . 1 1 1 1 
-                    1 . . . . . . . . . . . . . . 1 
-                    1 . . . . . . . . . . . . . . 1 
-                    1 . . f f f f f f . . . . . . 1 
+                    . . . . . . . . . . . . . . . . 
+                    . . . . . . . . . . . . . . . . 
+                    . . . . . . . . . . . . . . . . 
+                    . . . f f f f f f . . . . . . . 
                     . . f 7 7 7 7 7 7 f . . . . . . 
                     . f 7 7 f 1 7 1 f 7 f . . . . . 
                     . f 7 7 f f 7 f f 7 f . . . . . 
@@ -71,10 +81,10 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
                     . . f 6 7 7 7 7 f 7 f 7 f . . . 
                     . . f f 6 6 6 6 f 6 7 7 f . . . 
                     . . . f f f f f . f f f . . . . 
-                    1 . . . f 7 f . . . . . . . . 1 
-                    1 . . . f 7 f . . . . . . . . 1 
-                    1 . f f 7 7 f f . . . . . . . 1 
-                    1 1 1 1 7 f 7 7 f . . . 1 1 1 1 
+                    . . . . f 7 f . . . . . . . . . 
+                    . . . . f 7 f . . . . . . . . . 
+                    . . . f 7 7 f f . . . . . . . . 
+                    . . f 7 7 f 7 7 f . . . . . . . 
                     `, SpriteKind.shooter)
                 mySprite2.setPosition(mySprite.x, mySprite.y)
                 mySprite.setImage(img`
@@ -129,10 +139,10 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         if (tiles.tileAtLocationEquals(tiles.getTileLocation(grid.spriteCol(mySprite), grid.spriteRow(mySprite)), sprites.castle.tileGrass1)) {
             if (Sunflower >= 1) {
                 mySprite2 = sprites.create(img`
-                    1 1 1 1 . . . . . . . . 1 1 1 1 
-                    1 . . . . . f f . . f f . . . 1 
-                    1 . . . . f f 5 f f 5 5 f f f 1 
-                    1 . . f f f 5 5 f 5 5 5 f 5 f 1 
+                    . . . . . . . . . . . . . . . . 
+                    . . . . . . f f . . f f . . . . 
+                    . . . . . f f 5 f f 5 5 f f f . 
+                    . . . f f f 5 5 f 5 5 5 f 5 f . 
                     . . . f 5 5 f f f f f f 5 5 5 f 
                     . . . f 5 f e e 1 e e 1 e f f 5 
                     . . f 5 f e e e f e e f e e f 5 
@@ -141,10 +151,10 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
                     . . f f f f e e e e e e e f 5 5 
                     . . . . f 5 f f f f f f f 5 f f 
                     . . . . f f f f 5 f 5 5 f f f . 
-                    1 . . . . f 6 f f 7 f f f f . 1 
-                    1 . . . f 6 f f 7 7 7 f f 6 f 1 
-                    1 . . f 6 f 7 7 7 f 7 7 7 f 6 1 
-                    1 1 1 1 f f f f f f f f 1 1 1 1 
+                    . . . . . f 6 f f 7 f f f f . . 
+                    . . . . f 6 f f 7 7 7 f f 6 f . 
+                    . . . f 6 f 7 7 7 f 7 7 7 f 6 f 
+                    . . . f f f f f f f f f f f f f 
                     `, SpriteKind.Plants)
                 mySprite2.setPosition(mySprite.x, mySprite.y)
                 mySprite.setImage(img`
@@ -173,13 +183,153 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
                 Sunflower = 0
             }
         }
+        if (tiles.tileAtLocationEquals(tiles.getTileLocation(grid.spriteCol(mySprite), grid.spriteRow(mySprite)), assets.tile`myTile8`)) {
+            if (info.score() >= 50) {
+                mySprite.setImage(img`
+                    1 1 1 1 . . . . . . . . 1 1 1 1 
+                    1 . f f f f f f f f f . . . . 1 
+                    1 f e f d 4 e e e e e f . . . 1 
+                    1 e f d e e e e e e e e f . . 1 
+                    e e f d e e e e e e e e f . . . 
+                    e f d 4 e e e e e e e e e f . . 
+                    e f 4 e e e 1 f e 1 f e e f . . 
+                    e f e e e e f f e f f e e f . . 
+                    e f e e e e e e e e e e e f . . 
+                    e f e e e e e e f e e e e f . . 
+                    e f e e e e e e e e e e e f . . 
+                    e f e e e e e e e e e e e f . . 
+                    1 e f e e e e e e e e e f . . 1 
+                    1 e f e e e e e e e e e f . . 1 
+                    1 f e f e e e e e e e f . . . 1 
+                    1 1 1 1 f f f f f f f . 1 1 1 1 
+                    `)
+                Wallnut += 1
+            }
+        }
+        if (tiles.tileAtLocationEquals(tiles.getTileLocation(grid.spriteCol(mySprite), grid.spriteRow(mySprite)), sprites.castle.tileGrass1)) {
+            if (Peashooter >= 1) {
+                mySprite2 = sprites.create(img`
+                    . . . . . . . . . . . . . . . . 
+                    . . f f f f f f f f f . . . . . 
+                    . f e f d 4 e e e e e f . . . . 
+                    f e f d e e e e e e e e f . . . 
+                    e e f d e e e e e e e e f . . . 
+                    e f d 4 e e e e e e e e e f . . 
+                    e f 4 e e e 1 f e 1 f e e f . . 
+                    e f e e e e f f e f f e e f . . 
+                    e f e e e e e e e e e e e f . . 
+                    e f e e e e e e f e e e e f . . 
+                    e f e e e e e e e e e e e f . . 
+                    e f e e e e e e e e e e e f . . 
+                    e e f e e e e e e e e e f . . . 
+                    f e f e e e e e e e e e f . . . 
+                    . f e f e e e e e e e f . . . . 
+                    . . f f f f f f f f f . 1 . . . 
+                    `, SpriteKind.wall)
+                mySprite2.setPosition(mySprite.x, mySprite.y)
+                mySprite.setImage(img`
+                    1 1 1 1 . . . . . . . . 1 1 1 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    . . . . . . . . . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . 1 1 1 1 1 1 1 . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 1 1 1 . . . . . . . . 1 1 1 1 
+                    `)
+                statusbar = statusbars.create(20, 4, StatusBarKind.Health)
+                statusbar.max = 4
+                statusbar.attachToSprite(mySprite2)
+                statusbar.setFlag(SpriteFlag.Invisible, true)
+                info.changeScoreBy(-50)
+                Wallnut = 0
+            }
+        }
+        if (tiles.tileAtLocationEquals(tiles.getTileLocation(grid.spriteCol(mySprite), grid.spriteRow(mySprite)), assets.tile`kabbagePult`)) {
+            if (info.score() >= 125) {
+                mySprite.setImage(img`
+                    1 1 1 1 f f . . . . . . 1 1 1 1 
+                    1 7 7 7 7 7 f . . . . . . . . 1 
+                    1 7 6 6 6 6 7 f . . . . . . . 1 
+                    1 f 7 6 6 6 f . . . . . . . . 1 
+                    . . f f 7 f f . . . . . . . . . 
+                    . . . . f 7 f . . . . . . . . . 
+                    . . . . f f f f f f f f f . . . 
+                    . . . f 7 6 7 7 7 7 7 6 6 f . . 
+                    . . f 7 7 7 6 7 6 6 6 7 7 7 f . 
+                    . . f 6 6 6 6 6 7 7 7 6 6 6 f . 
+                    . . f 7 7 7 6 7 1 f 6 1 f 7 f . 
+                    . . f 6 6 6 6 6 f f 7 f f 6 f . 
+                    1 . f 7 7 7 6 7 7 7 6 6 7 7 f 1 
+                    1 . . f 6 6 7 6 6 6 7 7 7 f . 1 
+                    1 . . . f f f f f f f f f . . 1 
+                    1 1 1 1 6 7 7 f . f 6 7 1 1 1 1 
+                    `)
+                MelonPult += 1
+            }
+        }
+        if (tiles.tileAtLocationEquals(tiles.getTileLocation(grid.spriteCol(mySprite), grid.spriteRow(mySprite)), assets.tile`myTile3`)) {
+            if (MelonPult >= 1) {
+                mySprite2 = sprites.create(img`
+                    . f f f f f . . . . . . . . . . 
+                    f 7 7 7 7 7 f . . . . . . . . . 
+                    f 7 6 6 6 6 7 f . . . . . . . . 
+                    f f 7 6 6 6 f . . . . . . . . . 
+                    . . f f 7 f f . . . . . . . . . 
+                    . . . . f 7 f . . . . . . . . . 
+                    . . . . f f f f f f f f f . . . 
+                    . . . f 7 6 7 7 7 7 7 6 6 f . . 
+                    . . f 7 7 7 6 7 6 6 6 7 7 7 f . 
+                    . . f 6 6 6 6 6 7 7 7 6 6 6 f . 
+                    . . f 7 7 7 6 7 1 f 6 1 f 7 f . 
+                    . . f 6 6 6 6 6 f f 7 f f 6 f . 
+                    . . f 7 7 7 6 7 7 7 6 6 7 7 f . 
+                    . . . f 6 6 7 6 6 6 7 7 7 f . . 
+                    . . . . f f f f f f f f f . . . 
+                    . . . f 6 7 7 f . f 6 7 6 f . . 
+                    `, SpriteKind.Pult)
+                mySprite2.setPosition(mySprite.x, mySprite.y)
+                mySprite.setImage(img`
+                    1 1 1 1 . . . . . . . . 1 1 1 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    . . . . . . . . . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . 1 1 1 1 1 1 1 . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    . . . . . . . 1 . . . . . . . . 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 . . . . . . . . . . . . . . 1 
+                    1 1 1 1 . . . . . . . . 1 1 1 1 
+                    `)
+                statusbar = statusbars.create(20, 4, StatusBarKind.Health)
+                statusbar.max = 4
+                statusbar.attachToSprite(mySprite2)
+                statusbar.setFlag(SpriteFlag.Invisible, true)
+                info.changeScoreBy(-125)
+                MelonPult = 0
+            }
+        }
     }
 })
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Plants, function (sprite, otherSprite) {
     sprite.setVelocity(0, 0)
     statusbars.getStatusBarAttachedTo(StatusBarKind.Health, otherSprite).value += -0.05
     if (statusbars.getStatusBarAttachedTo(StatusBarKind.Health, otherSprite).value == 0) {
-        sprite.setVelocity(0, -3)
+        sprite.setVelocity(-3, 0)
         sprites.destroy(otherSprite)
     }
 })
@@ -233,6 +383,7 @@ let projectile: Sprite = null
 let sun: Sprite = null
 let ZombieHp: StatusBarSprite = null
 let mySprite5: Sprite = null
+let MelonPult = 0
 let statusbar: StatusBarSprite = null
 let mySprite2: Sprite = null
 let P2 = 0
@@ -579,10 +730,44 @@ game.onUpdateInterval(2000, function () {
         projectile.lifespan = 2000
     }
 })
+game.onUpdateInterval(2500, function () {
+    for (let value of sprites.allOfKind(SpriteKind.Pult)) {
+        projectile = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . f f f f f f f f . . . . 
+            . . . f 7 7 7 7 7 7 7 6 f . . . 
+            . . . f 6 6 6 6 6 6 6 7 f . . . 
+            . . . f 7 7 7 7 7 7 7 6 f . . . 
+            . . . f 6 6 6 6 6 6 6 7 f . . . 
+            . . . . f f f f f f f f . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.MelonProjectile)
+        projectile.setPosition(value.x, value.y)
+        projectile.setVelocity(50, 0)
+        projectile.lifespan = 2000
+    }
+})
 game.onUpdateInterval(15000, function () {
-    for (let value of sprites.allOfKind(SpriteKind.Plants)) {
+    if (wave == 1) {
+        wave1()
+        pause(500)
+    }
+    if (kill == 20) {
+        game.gameOver(true)
+    }
+})
+game.onUpdateInterval(15000, function () {
+    for (let value2 of sprites.allOfKind(SpriteKind.Plants)) {
         animation.runImageAnimation(
-        value,
+        value2,
         [img`
             . . . . . . . . . . . . . . . . 
             . . . . . . f f . . f f . . . . 
@@ -638,16 +823,7 @@ game.onUpdateInterval(15000, function () {
             . . . . . 5 . 5 . 5 . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
-            `, value, 0, 0)
+            `, value2, 0, 0)
         sun.setKind(SpriteKind.soon)
-    }
-})
-game.onUpdateInterval(15000, function () {
-    if (wave == 1) {
-        wave1()
-        pause(500)
-    }
-    if (kill == 20) {
-        game.gameOver(true)
     }
 })
